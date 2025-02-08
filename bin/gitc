@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+if ! git status | grep "Changes to be committed" -q; then
+    echo "Nothing staged, adding everything..."
+    git add .
+fi
+git status
+read -p "press enter to commit changes... (ctrl+c to cancel)"
+message="$@"
+if git commit -m "$message"; then
+    git push
+fi

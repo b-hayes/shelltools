@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(readlink -f "${0%/*}")
+source $SCRIPT_DIR/imports
+
+# I made this a generic copy and paste file.
+#   You can rename the file and it will look in a different folder for its list of commands.
+SCRIPT_NAME=`basename $0`
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+COMMANDS_FOLDER=`readlink -f $SCRIPT_DIR/commands/$SCRIPT_NAME`
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $SCRIPT_NAME <command> ...args"
+    echo "Commands available:"
+    for D in `ls -d $COMMANDS_FOLDER/*`
+    do
+      echo "   `basename $D`"
+    done
+    exit 1
+fi
+
+#check if it exists first.
+if [ ! -f $COMMANDS_FOLDER/$1 ]; then
+  echo -e "${Red}$1 command not found.${NC}"
+  exit 1
+fi
+
+# Run tool setup
+echo "⚡ Setting up $1 ..."
+$COMMANDS_FOLDER/$@

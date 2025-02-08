@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+if ! (return 0 2>/dev/null); then
+    #Not sourced, lets show some info...
+    echo -e "${Red}This script is meant to be sourced not executed.${NC}"
+    echo -e "USAGE:${Bold} source `basename $0`${NC}"
+    echo "This imports a lot of common functionility used in my bash scripts."
+    exit
+fi
+
+
+if [[ "$@" == *"--debug-devtools"* ]]; then
+	# Debugging devtools add verbose output...
+	DT_DEBUG=true
+	echo "Debug mode"
+fi
+
+
+# Setup some vars
+DT_BIN_DIR="$(dirname $(readlink -f $BASH_SOURCE))"
+DT_IMPORTS_DIR="$DT_BIN_DIR/_imports"
+# So the executing scripts to knows their own file && folder etc.
+__FILE__=$(readlink -f $0)
+__DIR__="$(dirname $__FILE__)"
+
+# Loop through each file in the bin folder
+for file in "$DT_IMPORTS_DIR"/*; do
+  [ $DT_DEBUG ] && echo -e "${dim}source $file ${NC}"
+  source $file
+done
+
+if [ $DT_DEBUG ]; then
+	echo -e "\nResulting Devtools definitions:${Dim}"
+	set | grep DT_
+	#There is no nice way to detect everything specific to devtools unless they use the DT_ prefix
+	# so for others we have to manually print them
+	echo "__FILE__=$__FILE__"
+	echo "__DIR__=$__DIR__"
+	echo -e "$NC \n"
+fi

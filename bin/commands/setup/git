@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+source imports
+
+OS=$(os)
+
+# Setup the OS specific options first in order of overriding layers.
+if [[ $OS == "Windows" ]] || [[ $OS == "WSL"* ]]; then
+    # PREVENT CONFUSION BETWEEN LINUX AND WINDOWS
+    git config --global core.autocrlf input
+    git config --global core.eol lf
+    git config --global core.filemode false   # means nothing to Windows so best to ignore it.
+    git config --global core.ignorecase false # allow windows to rename file case.
+    echo "Filemode was disabled to prevent issues with WSL and Windows, if you need to commit executables use the gmod command."
+fi
+
+if [[ $OS == "WSL"* ]]; then
+    echo "You can share the git credentials with Windows allowing WSL to just sing in with a browser."
+    if confirm "Use the Git for windows credential manager inside WSL?"; then
+      git config --global credential.helper "/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-wincred.exe"
+    fi
+fi
+
+#SETUP CREDENTIALS
+# Use existing settings as defaults
+git config --global credential.helper store
+NAME=$(git config --global user.name || echo $USER)
+EMAIL=$(git config --global user.email || echo '')
+
+read -p "Enter your git account user name [$NAME]: " NAME
+NAME=${NAME:-$NAME} #Use the default if empty
+git config --global user.name $NAME
+
+read -p "Enter your git account email [$EMAIL]: " EMAIL
+EMAIL=${EMAIL:-$EMAIL} #Use the default if empty
+git config --global user.email $EMAIL
+
+#SETUP SOME COMMON NICE TO HAVES
+git config --global core.pager cat #our terminals have scrollbars so we dont need paging.
+git config --global core.editor "nano" #because nobody wants to be stuck in VI during a merge.

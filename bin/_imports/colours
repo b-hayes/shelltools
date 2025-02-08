@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# This is not a full list.
+DT_COLOURS_LOADED='NC, Bold, Dim, Default, Black, Red, Green, Yellow, Blue, Magenta, Cyan, Lightgray, Darkgray, LightRed, LightGreen, LightYellow, LightBlue, LightMagenta, Lightcyan, White'
+
+# Base Colours
+NC="\033[0m"
+Bold="\033[1m"
+Dim="\033[2m"
+Default="\033[39m"
+
+Black="\033[30m"
+Red="\033[31m"
+Green="\033[32m"
+Yellow="\033[33m"
+Blue="\033[34m"
+Magenta="\033[35m"
+Cyan="\033[36m"
+Lightgray="\033[37m"
+Darkgray="\033[90m"
+LightRed="\033[91m"
+LightGreen="\033[92m"
+LightYellow="\033[93m"
+LightBlue="\033[94m"
+LightMagenta="\033[95m"
+Lightcyan="\033[96m"
+White="\033[97m"
+
+# Extended Colours that may or may not be supported by the users terminal.
+Orange="\033[38;5;202m"
+Purple="\033[35m"
+# see: https://misc.flogisoft.com/bash/tip_colors_and_formatting for more potential colours.
+
+if (return 0 2>/dev/null); then
+    return 0 #script was sourced.
+fi
+#Not sourced, lets show some info...
+
+for fgbg in 38 48; do         # Foreground / Background
+    for color in {0..255}; do # Colors
+        # Display the color
+        printf "\e[${fgbg};5;%sm  %3s  \e[0m" $color $color
+        # Display 6 colors per lines
+        if [ $((($color + 1) % 6)) == 4 ]; then
+            echo # New line
+        fi
+    done
+    echo # New line
+done
+
+echo -e "${Red}This script is meant to be sourced not executed.${NC}"
+echo -e "USAGE:${Bold} source $(basename $0)${NC}"
+echo -e "Add this to your own scripts to access basic colour variables like ${Red}\$Red${NC} or ${Blue}\$Blue${NC}."
+echo -e "Variables include: $DT_COLOURS_LOADED"
+echo -e "Edit this file to see/add colour variables and be sure to use \$NC at the end of your output to stop colours bleeding into other commands."
+exit 1

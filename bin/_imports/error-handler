@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# source colours
+
+if ! (return 0 2>/dev/null); then
+    #Not sourced, lets show some info...
+    echo -e "${Red}This script is meant to be sourced not executed.${NC}"
+    echo -e "USAGE:${Bold} source `basename $0`${NC}"
+    echo "Add this to your own scripts to make them stop execution when any command inside it fails."
+    exit
+fi
+
+# HALT EXECUTION WHEN ANY COMMAND FAILS AND PROVIDE A STACK TRACE.
+#   Full stack trace only works if every script in the execution chain includes this script.
+set -eE
+trap 'DT_ErrorHandler $LINENO $COMMAND' ERR
+DT_ErrorHandler() {
+  echo -e "${Dim}TRACE: `basename $0` failed in `readlink -f $0` on line $1${NC}"
+  exit $?
+}
