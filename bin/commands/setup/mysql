@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+#SETUP ERROR HANDLING SO WE DONT KEEP GOING WHEN SOMETHING ELSE FAILS
+SCRIPT=`readlink -f $0`
+set -eE
+trap 'catchError $LINENO' ERR
+catchError() {
+  echo "`basename $SCRIPT` failed!
+   in file $SCRIPT from line $1"
+  exit $1
+}
+
+if command -v mysql & [[ "$1" == "" ]]; then
+   echo "MySQL is already installed. Try starting the service or specify a version to force install."
+   echo "try using 'purge' to clean out the current installation, so you can install again."
+   exit 0
+fi
+
+if [[ `uname` == *"MINGW64_NT"* ]]; then
+  echo "Windows is not supported try wsl or download portable xampp from:"
+  echo "https://sourceforge.net/projects/xampp/"
+  exit 1
+fi
+
+if [[ "$1" == "purge" ]]; then
+  sudo service mysql stop
+  sudo apt purge mysql*
+  sudo apt autoremove
+  sudo apt autoclean
+  sudo rm -rfv /var/lib/mysql/mysql
+  sudo rm -rfv /etc/mysql/
+  echo "Mysql should be gone, and you can start fresh now."
+  echo "If you keep having issues, perhaps using a docker container is better?"
+  exit 0
+fi
+
+
+#the default install
+sudo apt update
+sudo apt upgrade -y
+sudo apt install mysql-server
+sudo usermod -d /var/lib/mysql/ mysql
+sudo service mysql start
+read -p "Press Enter to configure mysql."
+sudo mysql_secure_installation
+
+
+mysql --version

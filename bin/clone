@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+if [ -z $1 ]; then
+    echo "useage: clone <git-user>/<reponame>"
+    echo "  results in: git clone https://github.com/<git-user>/<reponame>"
+    echo "  if no slash then just repo name is assumed and current git user name will be used"
+    exit 0
+fi
+
+REPO=$1
+
+if [[ "$1" != *\/* ]]; then
+    # uncomment to use parent directory name as the vendor/company/user name for the repo.
+    # REPO="$(basename $(pwd))/${1}"
+    # uncomment to below uses your github user name if the repo company/user is not specified.
+    REPO="$(git config user.name)/${1}"
+
+    # remove $1 from arguments so the rest can be passed along to the command.
+    shift
+fi
+echo "Cloning https://github.com/${REPO}"
+git clone https://github.com/${REPO} $@

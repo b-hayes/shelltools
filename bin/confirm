@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+MESSAGE=${1:-"Are you sure?"}
+DEFAULT=${2:-"YES"}
+CANCEL=${3:-"no"}
+
+#loops until yes or no is selected.
+while [ "$RESPONSE" == "" ]; do
+
+    read -p "$MESSAGE [${DEFAULT}/$CANCEL]> " RESPONSE
+    RESPONSE=${RESPONSE:-$DEFAULT}
+    LOWERED=$(echo $RESPONSE | tr '[:upper:]' '[:lower:]')
+    #if yes is the default allow yes in any form it may take and exit successfully with no output
+    if [ "$DEFAULT" == "YES" ] || [ "$DEFAULT" == "NO" ] && [ "$LOWERED" == "yes" ] || [ "$LOWERED" == "y" ]; then
+      exit 0
+    fi
+    #if the default cancel response is being used then accept no in all its forms and exit failure with no output
+    if [ "$CANCEL" == "no" ] && [ $LOWERED == "no" ] || [ $LOWERED == "n" ]; then
+        exit 1
+    fi
+    RESPONSE=""
+done
+
+# TODO: if the default is something else I want to make it editable, and already breaks the loop for any input.

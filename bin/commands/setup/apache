@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+source imports
+
+if command -v apachectl; then
+  echo "Apache is already installed.
+  Try: sudo service apache2 start.
+If you need to re-install from scratch try adding purge argument.
+"
+  exit 0
+fi
+
+if [ "$1" == "purge" ]; then
+  sudo apt-get purge apache2
+  sudo apt autoremove # remove leftover dependencies.
+  sudo apt-get install apache2
+  sudo service apache2 start
+fi
+
+sudo apt update
+sudo apt upgrade
+sudo apt-get install apache2
+
+echo "\nApache should be installed now.\n"
+echo "Default web folder is: /var/www/html"
+echo "to control apache2 service use: sudo system apache2 start|stop|restart
+"
+
+if [ confirm "Install php next?" ]; then
+  sudo apt install php
+  echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/phpinfo.php
+  echo "I've added phpinfo page for you: http://localhost/phpinfo.php
+If php is not processing you might need to enable it with: sudo a2enmod php8.1"
+fi
+
+if [ confirm "Install common mods for apache?" ]; then
+  sudo a2enmod rewrite
+  sudo service apache2 restart
+fi
